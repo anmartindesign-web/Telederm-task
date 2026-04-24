@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telederm – Production Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --purple: #534AB7;
+    --purple-light: #EEEDFE;
+    --gray-light: #F1EFE8;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --border: #e5e5e5;
+    --bg: #fafaf8;
+    --font-body: 'DM Sans', sans-serif;
+    --font-display: 'DM Serif Display', serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.7; }
+
+  .page-header { background: var(--navy); color: white; padding: 3rem 2.5rem 2.5rem; position: relative; overflow: hidden; }
+  .page-header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 280px; height: 280px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.06); }
+  .page-header::after { content: ''; position: absolute; bottom: -80px; left: 30%; width: 180px; height: 180px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.04); }
+  .header-badge { display: inline-block; background: var(--teal); color: white; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 1rem; }
+  .page-header h1 { font-family: var(--font-display); font-size: 2.2rem; font-weight: 400; line-height: 1.2; margin-bottom: 0.5rem; }
+  .page-header p { color: rgba(255,255,255,0.55); font-size: 14px; }
+
+  .legend-bar { display: flex; gap: 1.5rem; flex-wrap: wrap; padding: 1.25rem 2.5rem; background: white; border-bottom: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+  .section-header { display: flex; align-items: center; gap: 1rem; margin: 2.5rem 0 1rem; padding-bottom: 0.75rem; border-bottom: 1.5px solid var(--border); }
+  .section-num { font-family: var(--font-display); font-size: 1.1rem; color: var(--text-muted); font-style: italic; }
+  .section-title { font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; }
+  .section-time { margin-left: auto; font-size: 12px; font-family: var(--font-mono); color: var(--text-muted); background: var(--gray-light); padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+
+  .beat { background: white; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+  .beat-header { display: flex; align-items: flex-start; gap: 1rem; padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border); }
+  .beat-tc { font-family: var(--font-mono); font-size: 11px; color: white; background: var(--navy); padding: 3px 9px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+  .beat-script { font-size: 14px; color: var(--text); line-height: 1.6; flex: 1; font-style: italic; }
+  .beat-script em { font-style: normal; color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px; }
+  .doctor-tag { display: inline-block; font-size: 10px; font-weight: 600; background: var(--navy); color: white; padding: 2px 7px; border-radius: 4px; margin-left: 6px; letter-spacing: 0.04em; vertical-align: middle; font-style: normal; }
+
+  .beat-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+  @media (max-width: 640px) { .beat-body { grid-template-columns: 1fr; } }
+  .beat-col { padding: 1rem 1.25rem; border-right: 1px solid var(--border); }
+  .beat-col:last-child { border-right: none; }
+  .beat-col-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 6px; }
+  .beat-col-label .dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .beat-col ul { list-style: none; padding: 0; }
+  .beat-col ul li { font-size: 13px; color: var(--text); padding: 3px 0 3px 14px; position: relative; line-height: 1.5; }
+  .beat-col ul li::before { content: '–'; position: absolute; left: 0; color: var(--text-muted); }
+
+  .dur { display: inline-block; font-family: var(--font-mono); font-size: 10px; background: var(--teal-light); color: #0F6E56; padding: 1px 6px; border-radius: 4px; margin-left: 4px; font-style: normal; vertical-align: middle; white-space: nowrap; }
+
+  .col-broll .beat-col-label { color: var(--teal); }
+  .col-broll .dot { background: var(--teal); }
+  .col-effects .beat-col-label { color: var(--purple); }
+  .col-effects .dot { background: var(--purple); }
+  .col-music .beat-col-label { color: var(--amber); }
+  .col-music .dot { background: var(--amber); }
+
+  .phase-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; margin-left: 0.5rem; vertical-align: middle; }
+  .phase-pain { background: var(--coral-light); color: var(--coral); }
+  .phase-solution { background: var(--teal-light); color: var(--teal); }
+  .phase-how { background: var(--purple-light); color: var(--purple); }
+  .phase-trust { background: var(--amber-light); color: #7a5500; }
+  .phase-cta { background: #E6F1FB; color: #185FA5; }
+
+  .music-block { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top: 2rem; }
+  .music-block h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 400; margin-bottom: 1rem; }
+  .music-tracks { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; }
+  .track-card { border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; }
+  .track-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+  .track-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px; }
+  .track-tc { font-family: var(--font-mono); font-size: 11px; color: white; display: inline-block; padding: 2px 8px; border-radius: 4px; }
+
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-top: 1.5rem; }
+  .tip-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.1rem; }
+  .tip-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .tip-text { font-size: 13px; line-height: 1.5; color: var(--text); }
+
+  footer { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 3rem; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-badge">VSL Production Guide</div>
+  <h1>Telederm<br>Post-Production Guide</h1>
+  <p>B-Roll · Durations · On-Screen Effects · Music Cues · Timecodes</p>
+</div>
+
+<div class="legend-bar">
+  <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div> B-Roll + Duration</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div> On-Screen Effects</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div> Music</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0d1b2a; border-radius:3px;"></div> Doctor On Camera</div>
+  <span style="margin-left:auto;font-size:12px;color:#9b9b9b;">Estimated duration: ~4:30</span>
+</div>
+
+<div class="main">
+
+  <!-- ═══ PHASE 1 ═══ -->
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <span class="section-title">Pain <span class="phase-pill phase-pain">Hook</span></span>
+    <span class="section-time">00:00 – 00:45</span>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">00:00</span>
+      <div class="beat-script">"If getting help for your skin has begun feeling harder than it should, you're not imagining it."
+        <em>Video opens with doctor on camera — no b-roll<span class="doctor-tag">DOCTOR ON CAMERA</span></em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Doctor on camera from the first frame — hold for the entire line <span class="dur">~5 s</span></li>
+          <li>Fade in from black</li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Fade in from black</li>
+          <li>Emphasize "You're not imagining it" — can be full-screen or interactive with the doctor</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Track 1 begins — sparse piano or soft pads</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">00:05</span>
+      <div class="beat-script">"Because sometimes the real problem isn't just the skin issue itself. <u>It's in how much time, effort, and guesswork it seems to take to finally deal with it appropriately.</u>"
+        <em>Underlined phrase — cue for first b-roll</em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Doctor on camera during "Because sometimes…" <span class="dur">3 s</span></li>
+          <li>At "It's in how much time…" → first b-roll: person scanning a shelf of products <span class="dur">3 s</span></li>
+          <li>Person scrolling phone with a confused expression <span class="dur">3 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Smooth transitions between shots</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Hold — quiet, heavy atmosphere</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">00:20</span>
+      <div class="beat-script">"You try one product, then another. You read different opinions. You scroll, search, ask around, and still don't feel any closer to a real answer."
+        <em>Frustration spiral</em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Stack of open product tubes <span class="dur">2 s</span></li>
+          <li>Open browser with conflicting search results <span class="dur">2 s</span></li>
+          <li>Close-up of a search bar — something being typed <span class="dur">2 s</span></li>
+          <li>Person looking at phone with a confused expression <span class="dur">3 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Each cut slightly faster — building chaos</li>
+          <li>Slight desaturation on product shots</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Slight build — tension slowly rises</li>
+          <li>Optional: dissonant chord under "still don't feel any closer"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">00:32</span>
+      <div class="beat-script">"Because booking a regular dermatology appointment is hard to fit into your calendar, you keep putting it off."
+        <em>The procrastination moment</em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Person looking at a packed calendar on their phone <span class="dur">3 s</span></li>
+          <li>Wide shot of a waiting room (anonymous) <span class="dur">4 s</span></li>
+          <li>Wall clock — slow push in <span class="dur">3 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Subtitles</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Holds tension — no resolution</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">00:42</span>
+      <div class="beat-script">"And after a while, it's not only frustrating; it's also exhausting."
+        <em>Emotional peak of the pain section<span class="doctor-tag">DOCTOR ON CAMERA</span></em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Return to doctor — deliver the line on his face <span class="dur">full line</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Small pause before the pivot — ~0.5 s</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Music drops to near silence — before the pivot</li>
+          <li>One beat of quiet creates anticipation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PHASE 2 ═══ -->
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <span class="section-title">The Pivot <span class="phase-pill phase-solution">Introducing the Solution</span></span>
+    <span class="section-time">00:45 – 01:25</span>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">00:45</span>
+      <div class="beat-script">"That is exactly where Telederm comes in."
+        <em>The pivot — most important line in the video<span class="doctor-tag">DOCTOR ON CAMERA</span></em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Doctor on camera with confident posture</li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Sharp color grade shift — warm white, brighter, teal tones</li>
+          <li>Telederm logo appears — clean fade or slide up from bottom</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Track 2 begins — music lifts, warm tone</li>
+          <li>Volume rises slightly (+3 dB)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">00:55</span>
+      <div class="beat-script">"Instead of working around office hours, waiting rooms, referrals, long delays… you can start your visit online from wherever you are."
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Person at a laptop in a cozy home setting <span class="dur">4 s</span></li>
+          <li>Someone filling out a form on their phone outdoors (park, café) <span class="dur">3 s</span></li>
+          <li>Screen recording of Telederm app/website — if available <span class="dur">5 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Smooth transitions between shots</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Steady, optimistic — balanced, not yet at full peak</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PHASE 3 ═══ -->
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <span class="section-title">How It Works <span class="phase-pill phase-how">Process</span></span>
+    <span class="section-time">01:25 – 02:45</span>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">01:25</span>
+      <div class="beat-script">"First, you choose the skin concern you need help with, and then begin your visit online."
+        <em>Step 1 of 3</em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Screen showing skin concern selection (mockup or real) <span class="dur">4 s</span></li>
+          <li>Finger tapping a concern on a phone screen <span class="dur">2 s</span></li>
+          <li>Close-up — legible interface <span class="dur">3 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Animated counter: "Step 1" slides in from the left</li>
+          <li>Icon or badge appears on screen</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Track 3 begins — light rhythm, sense of forward momentum</li>
+          <li>Keep under doctor's voice, don't compete</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">01:40</span>
+      <div class="beat-script">"Then, you answer a few questions… You also upload photos so that we can take a closer look."
+        <em>Step 2 of 3</em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Person typing answers on their phone <span class="dur">3 s</span></li>
+          <li>Close-up of fingers uploading a photo <span class="dur">2 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Animated counter: "Step 2"</li>
+          <li>Optional: soft "upload complete" checkmark animation</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>No change — steady and building slightly</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">01:58</span>
+      <div class="beat-script">"From there, one of our licensed providers reviews your case based on your answers, photos, and specific concerns."
+        <em>Step 3 — provider review</em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Provider at a clean desk reviewing a tablet <span class="dur">4 s</span></li>
+          <li>Close-up of screen with patient notes (blurred) <span class="dur">3 s</span></li>
+          <li>Provider carefully examining information <span class="dur">3 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Animated counter: "Step 3"</li>
+          <li>Warm, professional color grade</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Slightly more authoritative mood — steady, confident</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">02:18</span>
+      <div class="beat-script">"If treatment is medically appropriate, your provider will recommend a treatment plan tailored to your case."
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Screen showing a personalized treatment plan <span class="dur">4 s</span></li>
+          <li>Prescription or plan being reviewed on a phone <span class="dur">3 s</span></li>
+          <li>Doctor on camera for emphasis <span class="dur">full line</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Subtitles</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Hold steady — approaching the key payoff moment</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">02:32</span>
+      <div class="beat-script">"We ship your treatment directly to your home. That's what makes the process feel clear, guided, and complete."
+        <em>Key visual payoff moment</em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Clean white box arriving at a door / being unboxed <span class="dur">4 s</span></li>
+          <li>Person taking out the product, looking relieved and happy <span class="dur">4 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Slow-motion unboxing</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Small musical "arrival" — gentle resolution</li>
+          <li>Feeling of completion and satisfaction</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PHASE 4: TRUST + CTA (COMBINED) ═══ -->
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <span class="section-title">Trust &amp; Call to Action <span class="phase-pill phase-trust">Authority</span> <span class="phase-pill phase-cta">CTA</span></span>
+    <span class="section-time">02:45 – 04:30</span>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">02:45</span>
+      <div class="beat-script">"And that matters, because this isn't just about convenience. It's still healthcare."
+        <em>Tone shift — grounded, serious<span class="doctor-tag">DOCTOR ON CAMERA</span></em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Return to doctor on camera — deliver the line on his face <span class="dur">full line</span></li>
+          <li>Clean, authoritative setting — lab coat optional</li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Slight desaturation — seriousness without darkness</li>
+          <li>Lower third: doctor's name + credentials</li>
+          <li>Medical credential badge, if available</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Track 3 dips slightly — doctor's authority takes the foreground</li>
+          <li>More neutral tone in this section</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">03:05</span>
+      <div class="beat-script">"If you're wondering whether online dermatology can really be legitimate, that's a fair question."
+        <em>Direct objection handling<span class="doctor-tag">DOCTOR ON CAMERA</span></em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Stay on doctor — direct and personal <span class="dur">full line</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Verification badge, "Licensed Medical Review" stamp</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Restrained — trust is built through silence and understatement</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">03:25</span>
+      <div class="beat-script">"Your case is reviewed based on all of the specific details you provide… You don't need to have everything figured out before you begin."
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Person calmly filling out a form on their phone <span class="dur">4 s</span></li>
+          <li>Someone looking at their phone with a reassured expression <span class="dur">3 s</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Warm color grade returns — reassuring, not clinical</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Warm tone returns — moving toward the CTA build</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">03:50</span>
+      <div class="beat-script">"So if your skin has been bothering you, and you're tired of guessing, waiting, or putting this off — this is your chance to take that next step."
+        <em>Emotional CTA build</em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Happy person with clear skin <span class="dur">2 s</span></li>
+          <li>Someone checking their phone with a positive reaction <span class="dur">2 s</span></li>
+          <li>Person confidently going about their day <span class="dur">2 s</span></li>
+          <li>End on doctor on camera for the final line <span class="dur">to end</span></li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Music and visuals swell — full warmth of color grade</li>
+          <li>Edit pace slightly quickens</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Track 3 — full lift: most emotional moment in the video</li>
+          <li>If there's a chorus — this is where it hits</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="beat">
+    <div class="beat-header">
+      <span class="beat-tc">04:10</span>
+      <div class="beat-script">"You can start your visit today and see if Telederm is the right fit for your skin issues!"
+        <em>Final call to action<span class="doctor-tag">DOCTOR ON CAMERA</span></em>
+      </div>
+    </div>
+    <div class="beat-body">
+      <div class="beat-col col-broll">
+        <div class="beat-col-label"><span class="dot"></span>B-Roll</div>
+        <ul>
+          <li>Doctor on camera — confident, warm, direct eye contact <span class="dur">to end of video</span></li>
+          <li>Hold this shot through the final end card</li>
+        </ul>
+      </div>
+      <div class="beat-col col-effects">
+        <div class="beat-col-label"><span class="dot"></span>Effects</div>
+        <ul>
+          <li>Final end card slides in: Telederm logo + CTA button</li>
+          <li>URL or "Start Your Visit" — large, readable</li>
+          <li>Animated button pulse to draw attention</li>
+          <li>Transition to white or logo — clean exit</li>
+        </ul>
+      </div>
+      <div class="beat-col col-music">
+        <div class="beat-col-label"><span class="dot"></span>Music</div>
+        <ul>
+          <li>Music resolves warmly and positively</li>
+          <li>Low volume under the final end card</li>
+          <li>Soft fade over 3–4 seconds</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MUSIC MAP -->
+  <div class="music-block">
+    <h3>🎵 Full Music Map — 3 Tracks</h3>
+    <div class="music-tracks">
+      <div class="track-card">
+        <div class="track-name">Track 1 — Pain Theme</div>
+        <div class="track-desc">Sparse melancholic piano or ambient pads. No drums. Empathy without melodrama. Introspective, human.</div>
+        <span class="track-tc" style="background:#444;">00:00 – 00:44</span>
+      </div>
+      <div class="track-card">
+        <div class="track-name">Track 2 — Pivot / Lift</div>
+        <div class="track-desc">Lifts on Telederm's appearance. Warm acoustic guitar or light optimistic electronic pulse. Emotional gear change — the most important music moment.</div>
+        <span class="track-tc" style="background:#1D9E75;">00:45 – 01:24</span>
+      </div>
+      <div class="track-card">
+        <div class="track-name">Track 3 — Process → Trust → CTA</div>
+        <div class="track-desc">One track through the rest of the video. Starts steady and confident, dips slightly for the trust section, then builds to a full emotional lift for the CTA. Choose a track with a natural, expressive finish.</div>
+        <span class="track-tc" style="background:#534AB7;">01:25 – 04:30</span>
+      </div>
+    </div>
+    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border);">
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:0.5rem; font-weight:600;">Recommended royalty-free sources:</p>
+      <p style="font-size:13px; color:var(--text);">
+        <strong>Musicbed</strong> — premium, best for healthcare &nbsp;·&nbsp;
+        <strong>Artlist.io</strong> — optimistic sections &nbsp;·&nbsp;
+        <strong>Epidemic Sound</strong> — large catalog &nbsp;·&nbsp;
+        <strong>Soundstripe</strong> — budget-friendly, medical/wellness tracks
+      </p>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:0.5rem;">Search terms: "calm optimistic", "healthcare warm", "inspiring minimal", "emotional resolve", "acoustic build"</p>
+    </div>
+  </div>
+
+  <!-- PRODUCTION NOTES -->
+  <div class="section-header" style="margin-top:2.5rem;">
+    <span class="section-num">→</span>
+    <span class="section-title">Production Notes</span>
+  </div>
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-label">Color Grade</div>
+      <div class="tip-text">Two looks: cool/desaturated for pain, warm/bright after "Telederm comes in." This visual shift does half the storytelling work automatically.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-label">Text Overlays</div>
+      <div class="tip-text">Captions needed during all the video - some text can be emphasised additionally with animation/effects</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-label">Pacing</div>
+      <div class="tip-text">Pain section: 3–4 s per shot. How it works: 1.5–2 s. CTA: pace quickens, then holds on the doctor's final shot. Rhythm = emotion.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-label">B-Roll Casting</div>
+      <div class="tip-text">Diverse skin tones among b-roll subjects — especially important for a dermatology brand. Signals inclusivity and builds broader trust.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-label">Audio Mixing</div>
+      <div class="tip-text">Doctor's voice: –12 dBFS. Music under speech: –22 to –26 dBFS. Music only: –16 dBFS. Voice always wins the competition with music.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-label">End Card</div>
+      <div class="tip-text">Minimum 5–8 seconds. Logo, URL/CTA, optional short tagline. One action only: "Start Your Visit Today."</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Telederm VSL — Post-Production Guide · Built for editing
+</footer>
+
+</body>
+</html>
